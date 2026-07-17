@@ -25,6 +25,14 @@ def main() -> None:
     commands.add_parser("journal")
     reflect = commands.add_parser("reflect")
     reflect.add_argument("prompt")
+    perspective = commands.add_parser("perspective")
+    perspective.add_argument("topic")
+    perspective.add_argument("statement")
+    perspective.add_argument("--evidence", required=True)
+    perspective.add_argument("--confidence", type=float, default=0.6)
+    read = commands.add_parser("read")
+    read.add_argument("path", type=Path)
+    read.add_argument("--title")
     args = parser.parse_args()
     agent = HumanAI(args.store)
 
@@ -39,6 +47,10 @@ def main() -> None:
         print(json.dumps(agent.decide(args.options, args.goal).__dict__, indent=2))
     elif args.command == "reflect":
         print(agent.reflect(args.prompt))
+    elif args.command == "perspective":
+        print(json.dumps(agent.revise_perspective(args.topic, args.statement, args.evidence, args.confidence).as_dict(), indent=2))
+    elif args.command == "read":
+        print(json.dumps(agent.ingest_literature(args.path, args.title).__dict__, indent=2))
     else:
         print("\n".join(agent.journal) or "No journal entries yet.")
 

@@ -28,6 +28,17 @@ class HumanAITest(unittest.TestCase):
             agent.save()
             self.assertEqual(HumanAI(store).status()["persona"]["name"], "Aster")
 
+    def test_perspective_revision_keeps_evidence(self):
+        with TemporaryDirectory() as directory:
+            store = Path(directory) / "agent.json"
+            agent = HumanAI(store)
+            agent.revise_perspective("forgiveness", "Repair can matter.", "A literary passage", 0.6)
+            revised = agent.revise_perspective("forgiveness", "Repair needs accountability.", "A second passage", 0.8)
+
+            self.assertEqual(revised.confidence, 0.8)
+            self.assertEqual(len(revised.evidence), 2)
+            self.assertEqual(HumanAI(store).status()["perspectives"][0]["statement"], "Repair needs accountability.")
+
     def test_reflection_uses_relevant_memory(self):
         with TemporaryDirectory() as directory:
             agent = HumanAI(Path(directory) / "agent.json")

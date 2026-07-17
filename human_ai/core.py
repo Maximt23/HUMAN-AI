@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from .persona import Persona
+from .perspectives import Perspective
 
 
 @dataclass
@@ -66,6 +67,7 @@ class HumanAI:
         self.affect = Affect()
         self.memories: list[Memory] = []
         self.journal: list[str] = []
+        self.perspectives: dict[str, Perspective] = {}
         if store.exists():
             self._load()
 
@@ -81,6 +83,30 @@ class HumanAI:
         suffix = f" — {detail}" if detail else ""
         self._journal(f"Observed {event}{suffix}. Active state: {', '.join(self.affect.labels()) or 'steady'}.")
         self.save()
+
+    def revise_perspective(self, topic: str, statement: str, evidence: str, confidence: float) -> Perspective:
+        """Revise a modeled perspective with permanent, inspectable evidence."""
+        key = topic.strip().lower()
+        if not key or not evidence.strip():
+            raise ValueError("A topic and evidence are required to revise a perspective.")
+        perspective = self.perspectives.get(key)
+        if perspective is None:
+            perspective = Perspective(topic.strip(), statement.strip(), max(0.0, min(1.0, confidence)), [evidence.strip()])
+            self.perspectives[key] = perspective
+        else:
+            perspective.revise(statement.strip(), evidence.strip(), confidence)
+        self._journal(f"Perspective revised on {perspective.topic}: {perspective.statement}")
+        self.save()
+        return perspective
+
+    def ingest_literature(self, path: Path, title: str | None = None) -> Memory:
+        """Store a small provenance-bearing note from a local, authorized text file."""
+        text = path.read_text(encoding="utf-8").strip()
+        if not text:
+            raise ValueError("Literature file is empty.")
+        excerpt = " ".join(text.split())[:600]
+        source = f"literature:{title or path.stem} ({path.name})"
+        return self.remember(excerpt, source=source, confidence=0.8)
 
     def recall(self, query: str, limit: int = 3) -> list[Memory]:
         """Return relevant memories using a deliberately simple, inspectable score."""
@@ -128,6 +154,7 @@ class HumanAI:
             "affect_model": asdict(self.affect),
             "active_affect_labels": self.affect.labels(),
             "memory_count": len(self.memories),
+            "perspectives": [item.as_dict() for item in self.perspectives.values()],
             "journal_entries": len(self.journal),
             "recent_journal": self.journal[-3:],
             "disclaimer": "This is behavior modeling, not evidence of consciousness or feelings.",
@@ -142,6 +169,7 @@ class HumanAI:
             "name": self.name, "persona": self.persona.as_dict(),
             "values": self.values, "goals": self.goals,
             "affect": asdict(self.affect), "memories": [asdict(item) for item in self.memories],
+            "perspectives": {key: item.as_dict() for key, item in self.perspectives.items()},
             "journal": self.journal,
         }, indent=2), encoding="utf-8")
 
@@ -154,4 +182,5 @@ class HumanAI:
         self.goals = data.get("goals", self.goals)
         self.affect = Affect(**data.get("affect", {}))
         self.memories = [Memory(**item) for item in data.get("memories", [])]
+        self.perspectives = {key: Perspective(**item) for key, item in data.get("perspectives", {}).items()}
         self.journal = data.get("journal", [])

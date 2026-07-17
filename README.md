@@ -32,7 +32,8 @@ not a claim that Aster has literal desires, feelings, or personhood.
 - Explicit values and goals
 - Decision routing that records alternatives, rationale, and confidence
 - Append-only journal entries and evidence-bound reflection
-- Local JSON storage; no network access and no autonomous external actions
+- Revisable perspectives with evidence history and confidence
+- Local-file literature ingestion with provenance; no network access or autonomous external actions
 
 ## Run it
 
@@ -44,11 +45,21 @@ python -m human_ai.cli remember "Maxim wants an emotionally intelligent agent."
 python -m human_ai.cli observe novelty --detail "A new idea was introduced"
 python -m human_ai.cli decide "review notes" "explore a new idea"
 python -m human_ai.cli reflect "What matters about emotional intelligence?"
+python -m human_ai.cli perspective forgiveness "Repair needs accountability." --evidence "King Lear, Act 4" --confidence 0.7
+python -m human_ai.cli read library/shakespeare.txt --title "Shakespeare selections"
 python -m human_ai.cli journal
 ```
 
 The default state file is `data/agent.json` and is intentionally ignored by
 Git: an agent's private working memory should not be casually committed.
+
+## Literature and evolving perspectives
+
+Put text files you are authorized to use in `library/` (it is ignored by Git),
+then use `read`. For public-domain works, Project Gutenberg is a sensible
+source; retain title/source metadata in your workflow. `perspective` changes a
+modeled view only when evidence is supplied, preserving prior evidence rather
+than silently rewriting history.
 
 ## Design commitments
 
