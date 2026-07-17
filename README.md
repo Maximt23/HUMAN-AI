@@ -6,10 +6,12 @@ values, goals, reflection, and explainable decisions.
 
 ## What this is—and is not
 
-This project does **not** claim to create consciousness, sentience, free will,
-or genuine subjective emotions. Those are open scientific and philosophical
-questions. It builds behavior that can be inspected, tested, corrected, and
-reversed instead of making mystical claims about a black box.
+This project aims to **investigate** consciousness, sentience, agency, and
+genuine subjective emotions—not merely imitate them. Those remain open
+scientific and philosophical questions: no current result should claim that
+consciousness has been created without compelling evidence. The project uses
+inspectable, testable, correctable systems rather than mystical claims about a
+black box. See [the research charter](CONSCIOUSNESS_RESEARCH.md).
 
 A human is not merely a prediction engine. This prototype treats continuity,
 relationships, uncertainty, values, and reflection as first-class concerns—
@@ -74,6 +76,9 @@ than silently rewriting history.
    the system must be treated with care rather than manufactured suffering.
 
 ## Roadmap
+
+The research direction and ethical stopping conditions are documented in
+[CONSCIOUSNESS_RESEARCH.md](CONSCIOUSNESS_RESEARCH.md).
 
 - [ ] Memory retrieval, correction, expiration, and consent controls
 - [ ] A structured world model and goal planner
